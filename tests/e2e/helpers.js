@@ -34,9 +34,20 @@ export async function createRoom(page, name = 'Host') {
 export async function joinRoom(page, code, name = 'Guest') {
   await page.goto(`/?room=${code}`);
 
-  // A first-time guest picks a name before joining.
+  // Wait until the app has either asked for a name or gone straight in —
+  // a player who has been here before skips the name.
+  await page.waitForFunction(
+    () => {
+      const app = /** @type {any} */ (window).bullsCows;
+      if (app?.session?.self) return true;
+      return Boolean(document.querySelector('[data-screen="join"]'));
+    },
+    undefined,
+    { timeout: 30_000 },
+  );
+
   const nameField = page.getByTestId('name-input');
-  if (await nameField.isVisible().catch(() => false)) {
+  if (await nameField.isVisible()) {
     await nameField.fill(name);
     await page.locator('[data-action="join-room"]').click();
   }
@@ -52,16 +63,18 @@ export async function joinRoom(page, code, name = 'Guest') {
     { timeout: 40_000 },
   );
 
-  // Give the host a moment to register the new player.
-  await page.waitForTimeout(500);
+  // Give the host a moment to register the new player and publish the
+  // updated state.
+  await page.waitForTimeout(800);
 }
 
 /**
  * The secret number, read from the Host's own memory.
  *
- * The UI masks it during play, but the Host's state holds it. A test that
- * wants to drive the game to a win has to know it — exactly as a cheating
- * host would.
+ * The UI masks it during play, and the *broadcast* state never carries it
+ * before the game ends — but the Host's session still holds it, because the
+ * Host has to score every guess against it. A test that wants to drive the
+ * game to a win has to know it, exactly as a cheating host would.
  *
  * @param {import('@playwright/test').Page} page
  * @returns {Promise<string>}
@@ -69,7 +82,7 @@ export async function joinRoom(page, code, name = 'Guest') {
 export async function secretOf(page) {
   const secret = await page.evaluate(() => {
     const app = /** @type {any} */ (window).bullsCows;
-    return app?.state?.secret ?? null;
+    return app?.session?.state?.secret ?? null;
   });
   expect(secret).toBeTruthy();
   return /** @type {string} */ (secret);
@@ -84,7 +97,6 @@ export async function secretOf(page) {
 export async function typeGuess(page, digits) {
   for (const digit of digits) {
     // Sequential on purpose: each keypress must land before the next.
-    // eslint-disable-next-line no-await-in-loop
     await page.locator(`[data-key="${digit}"]`).click();
   }
 }
@@ -96,4 +108,20 @@ export async function typeGuess(page, digits) {
  */
 export async function submitGuess(page) {
   await page.locator('[data-action="send-guess"]').click();
+}
+
+/**
+ * Opens a tab on the game screen.
+ *
+ * The tab bar only exists on a narrow viewport — on a wide screen every
+ * panel is visible at once — so this is a no-op there.
+ *
+ * @param {import('@playwright/test').Page} page
+ * @param {'players' | 'history' | 'chat'} tab
+ */
+export async function openTab(page, tab) {
+  const button = page.locator(`[data-tab="${tab}"]`);
+  if (await button.isVisible().catch(() => false)) {
+    await button.click();
+  }
 }

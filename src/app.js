@@ -27,6 +27,7 @@ import { el, clear } from './ui/dom.js';
 import { icon } from './ui/icons.js';
 import { t } from './i18n/index.js';
 import { showBanner, hideBanner, showToast } from './ui/components/notices.js';
+import { createLanguageToggle } from './ui/components/language-toggle.js';
 import { createHomeScreen } from './ui/screens/home.js';
 import { createJoinScreen } from './ui/screens/join.js';
 import { createRoomScreen } from './ui/screens/room.js';
@@ -102,6 +103,9 @@ export class App {
 
   /** Whether the player has already chosen a name on this device. */
   #hasName = false;
+
+  /** @type {'home' | 'join' | 'room' | 'game' | 'result' | 'ended'} */
+  #screen = 'home';
 
   /** @type {ReturnType<typeof setInterval> | null} */
   #countdownTimer = null;
@@ -203,6 +207,7 @@ export class App {
    * @param {string} code
    */
   #renderJoin(code) {
+    this.#screen = 'join';
     clear(this.options.screenRoot);
 
     // Show the room the guest is about to join, so they can confirm it is
@@ -411,6 +416,13 @@ export class App {
       return;
     }
 
+    // The lobby. The Host is already in the waiting room; a guest arrives
+    // there as soon as the first state reaches it.
+    if (this.#screen !== 'room') {
+      this.#renderRoom();
+      return;
+    }
+
     this.#room?.update(state);
   }
 
@@ -513,10 +525,12 @@ export class App {
    * Renders the home screen.
    */
   #renderHome() {
+    this.#screen = 'home';
     clear(this.options.screenRoot);
     this.#renderRoomBar();
 
     const home = createHomeScreen({
+      onLanguageChange: () => this.#rerender(),
       onCreate: () => {
         unlockAudio();
         const name = home.name();
@@ -564,6 +578,7 @@ export class App {
    * Renders the waiting room.
    */
   #renderRoom() {
+    this.#screen = 'room';
     clear(this.options.screenRoot);
     this.#renderRoomBar();
 
@@ -602,6 +617,7 @@ export class App {
    * Renders the game screen.
    */
   #renderGame() {
+    this.#screen = 'game';
     clear(this.options.screenRoot);
     this.#renderRoomBar();
 
@@ -633,6 +649,7 @@ export class App {
    * Renders the result screen.
    */
   #renderResult() {
+    this.#screen = 'result';
     clear(this.options.screenRoot);
     this.#renderRoomBar();
 
@@ -669,6 +686,7 @@ export class App {
    * @param {string} hint
    */
   #renderEnded(title, hint) {
+    this.#screen = 'ended';
     clear(this.options.screenRoot);
     this.#renderRoomBar();
 
@@ -693,6 +711,35 @@ export class App {
 
     home.querySelector('button')?.addEventListener('click', () => this.leave());
     this.options.screenRoot.append(home);
+  }
+
+  /**
+   * Rebuilds the current screen.
+   *
+   * The interface is built from the locale tables, so a language change
+   * means the screen has to be built again — otherwise the buttons would
+   * still say the old thing.
+   */
+  #rerender() {
+    switch (this.#screen) {
+      case 'join':
+        this.#renderJoin(this.#code ?? '');
+        return;
+      case 'room':
+        this.#renderRoom();
+        return;
+      case 'game':
+        this.#renderGame();
+        return;
+      case 'result':
+        this.#renderResult();
+        return;
+      case 'ended':
+        this.#renderEnded(t('game.hostLeft'), t('game.hostLeftHint'));
+        return;
+      default:
+        this.#renderHome();
+    }
   }
 
   /**
@@ -782,6 +829,12 @@ export class App {
     if (hasSession) {
       actions.append(leave);
     }
+
+    actions.append(
+      createLanguageToggle(() => {
+        this.#rerender();
+      }),
+    );
 
     bar.append(chip, actions);
     bar.dataset.shareUrl = url;

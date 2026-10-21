@@ -84,8 +84,11 @@ export function showToast(root, { text, kind = 'info', durationMs = 3200 }) {
   };
 
   const toast = el(
-    `glass.animate-slide-in-top.pointer-events-auto.flex.max-w-sm.items-center.gap-2.rounded-2xl.border.px-4.py-2.5.text-sm.font-semibold ${tones[kind]}`,
-    { role: 'status' },
+    'div',
+    {
+      class: `glass animate-slide-in-top pointer-events-auto flex max-w-sm items-center gap-2 rounded-2xl border px-4 py-2.5 text-sm font-semibold ${tones[kind]}`,
+      role: 'status',
+    },
     [el('span', { text })],
   );
 

@@ -48,7 +48,15 @@ export function burstConfetti({ count = 160, durationMs = 2600 } = {}) {
   canvas.setAttribute('aria-hidden', 'true');
   document.body.append(canvas);
 
-  const context = canvas.getContext('2d');
+  /** @type {CanvasRenderingContext2D | null} */
+  let context = null;
+  try {
+    context = canvas.getContext('2d');
+  } catch {
+    // Some environments have no canvas at all. The celebration is
+    // decorative, so the game carries on without it.
+  }
+
   if (!context) {
     canvas.remove();
     return;

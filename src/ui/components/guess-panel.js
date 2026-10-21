@@ -50,6 +50,9 @@ export function createGuessPanel({ digitCount, enabled, onSubmit, onChange }) {
 
   const keypad = el('div.grid.grid-cols-3.gap-2', { 'data-testid': 'keypad' });
 
+  /** @type {HTMLButtonElement[]} */
+  const keypadButtons = [];
+
   const render = () => {
     for (let i = 0; i < tiles.length; i += 1) {
       const tile = tiles[i];
@@ -64,6 +67,13 @@ export function createGuessPanel({ digitCount, enabled, onSubmit, onChange }) {
       tile.classList.toggle('animate-breathe', isActive);
       tile.classList.toggle('bg-mint/10', Boolean(value));
       tile.classList.toggle('border-violet/40', !value && !isActive);
+    }
+
+    // The keypad is inert when it is not the player's turn, and it says so
+    // rather than silently swallowing the keypresses.
+    for (const button of keypadButtons) {
+      button.disabled = !isEnabled;
+      button.classList.toggle('opacity-40', !isEnabled);
     }
 
     sendButton.disabled = !isEnabled || digits.length !== digitCount;
@@ -123,17 +133,20 @@ export function createGuessPanel({ digitCount, enabled, onSubmit, onChange }) {
 
   for (const digit of ['1', '2', '3', '4', '5', '6', '7', '8', '9']) {
     const button = keyButton(digit, digit);
+    keypadButtons.push(button);
     button.addEventListener('click', () => press(digit));
     keypad.append(button);
   }
 
   const clearButton = keyButton('', t('game.clear'), 'bg-panel/60');
+  keypadButtons.push(clearButton);
   clearButton.append(icon('backspace', 22));
   clearButton.setAttribute('data-key', 'backspace');
   clearButton.addEventListener('click', backspace);
   keypad.append(clearButton);
 
   const zeroButton = keyButton('0', '0');
+  keypadButtons.push(zeroButton);
   zeroButton.addEventListener('click', () => press('0'));
   keypad.append(zeroButton);
 

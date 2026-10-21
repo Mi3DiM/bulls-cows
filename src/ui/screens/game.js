@@ -127,7 +127,8 @@ export function createGameScreen({ state, selfId, onGuess, onChat }) {
   const applyTabVisibility = () => {
     for (const [id, panel] of Object.entries(panels)) {
       const isActive = id === activeTab;
-      panel.classList.toggle('hidden', !isActive);
+      // Below the large breakpoint only the active tab is shown. From the
+      // large breakpoint up, every panel is visible at once.
       panel.classList.toggle('max-lg:hidden', !isActive);
     }
     for (const [id, button] of tabButtons) {

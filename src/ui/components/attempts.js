@@ -164,8 +164,12 @@ function createAttemptCard(attempt, digitCount) {
  */
 function badge(value, kind, tone, background) {
   return el(
-    `inline-flex.items-center.gap-1.rounded-full.px-2.py-0.5.text-[11px].font-extrabold ${tone} ${background}`,
-    { 'data-badge': kind, title: kind === 'bull' ? t('game.bulls') : t('game.cows') },
+    'span',
+    {
+      class: `inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-extrabold ${tone} ${background}`,
+      'data-badge': kind,
+      title: kind === 'bull' ? t('game.bulls') : t('game.cows'),
+    },
     [
       el('span.tnum', { text: String(value) }),
       el('span.text-[9px].uppercase.tracking-wide.opacity-80', {

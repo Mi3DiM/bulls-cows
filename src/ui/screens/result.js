@@ -112,7 +112,7 @@ export function createResultScreen({ state, selfId, isHost, onRestart, onHome })
 
   for (const [index, player] of rankedPlayers(state).entries()) {
     const row = el(
-      'div.flex.items-center.gap-2.5.rounded-xl.border.border-violet/20.bg-panel-soft/50.px-3.py-2',
+      'li.flex.items-center.gap-2.5.rounded-xl.border.border-violet/20.bg-panel-soft/50.px-3.py-2',
     );
     if (player.id === selfId) row.classList.add('border-cyan/40');
 

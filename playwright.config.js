@@ -37,6 +37,8 @@ export default defineConfig({
     {
       name: 'desktop',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } },
+      // The mobile layout has its own project.
+      testIgnore: /responsive\.spec\.js/,
     },
     {
       name: 'mobile',

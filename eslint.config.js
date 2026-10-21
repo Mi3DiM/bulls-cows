@@ -109,6 +109,9 @@ export default [
     rules: {
       'no-console': 'off',
       'max-len': 'off',
+      // An end-to-end flow is inherently sequential: each step depends on the
+      // one before it. Waiting for them in parallel would test nothing.
+      'no-await-in-loop': 'off',
     },
   },
 

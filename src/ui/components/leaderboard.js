@@ -54,7 +54,7 @@ export function renderLeaderboard(list, state, selfId) {
     const rating = starRating(player.points);
 
     const row = el(
-      'div.flex.items-center.gap-2.5.rounded-xl.border.border-violet/20.bg-panel-soft/50.px-3.py-2',
+      'li.flex.items-center.gap-2.5.rounded-xl.border.border-violet/20.bg-panel-soft/50.px-3.py-2',
       { 'data-rank': String(index + 1) },
     );
 
