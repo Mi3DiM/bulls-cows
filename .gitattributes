@@ -1,0 +1,18 @@
+# Normalise line endings so the repo behaves identically on every platform.
+* text=auto eol=lf
+
+*.js   text eol=lf
+*.mjs  text eol=lf
+*.css  text eol=lf
+*.html text eol=lf
+*.json text eol=lf
+*.md   text eol=lf
+*.yml  text eol=lf
+*.svg  text eol=lf
+
+# Never touch binary assets.
+*.png  binary
+*.jpg  binary
+*.webp binary
+*.woff2 binary
+*.ico  binary

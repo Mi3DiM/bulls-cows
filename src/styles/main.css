@@ -1,0 +1,250 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Design tokens
+ *
+ * Every colour, font and radius used by the app lives here. Components
+ * reference the token names, never a raw hex, so light/dark and RTL stay
+ * consistent and the contrast gate has a single source of truth.
+ * ------------------------------------------------------------------ */
+
+@theme {
+  /* Surfaces */
+  --color-void: #05011a;
+  --color-abyss: #0c0533;
+  --color-panel: #150a44;
+  --color-panel-soft: #1d0f57;
+  --color-elevated: #241273;
+
+  /* Brand */
+  --color-violet: #7c3aed;
+  --color-violet-deep: #4c1d95;
+  --color-magenta: #e935c1;
+  --color-cyan: #22d3ee;
+
+  /* Semantics */
+  --color-mint: #2bf59b;
+  --color-mint-deep: #059669;
+  --color-gold: #fbbf24;
+  --color-gold-deep: #d97706;
+  --color-rose: #fb4e6e;
+  --color-rose-deep: #9f1239;
+
+  /* Text */
+  --color-text: #f4f1ff;
+  --color-muted: #a79fe0;
+  --color-faint: #756bb0;
+
+  /* Typography
+   * Baloo 2 has no Arabic subset; Google Fonts emits per-subset unicode-range
+   * rules, so the browser routes Latin glyphs to Baloo and Arabic glyphs to
+   * Cairo automatically from this single stack. */
+  --font-display: 'Baloo 2', 'Cairo', ui-rounded, system-ui, sans-serif;
+  --font-body: 'Nunito', 'Cairo', ui-rounded, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* Shape */
+  --radius-tile: 1.25rem;
+  --radius-panel: 1.75rem;
+  --radius-pill: 999px;
+
+  /* Motion */
+  --ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-snap: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Base
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    color-scheme: dark;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    font-family: var(--font-body);
+    color: var(--color-text);
+    background-color: var(--color-abyss);
+    background-image:
+      radial-gradient(
+        ellipse 90% 60% at 50% -10%,
+        color-mix(in oklab, var(--color-violet) 42%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 70% 50% at 100% 100%,
+        color-mix(in oklab, var(--color-magenta) 24%, transparent),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 60% 40% at 0% 80%,
+        color-mix(in oklab, var(--color-cyan) 16%, transparent),
+        transparent 70%
+      ),
+      linear-gradient(180deg, var(--color-abyss) 0%, var(--color-void) 100%);
+    background-attachment: fixed;
+    overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Arabic gets a touch more line height; the script has taller ascenders. */
+  :lang(ar) body {
+    line-height: 1.75;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0;
+  }
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  button:disabled {
+    cursor: not-allowed;
+  }
+
+  /* Focus must always be visible — never remove the ring without a
+   * replacement of equal or better prominence. */
+  :focus-visible {
+    outline: 3px solid var(--color-cyan);
+    outline-offset: 2px;
+    border-radius: 0.5rem;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--color-violet) 70%, transparent);
+    color: var(--color-text);
+  }
+
+  /* Scrollbars, themed to the app rather than the OS. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-violet-deep) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: var(--color-violet-deep);
+    border-radius: var(--radius-pill);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ * Component layer
+ *
+ * Repeated, structured pieces of the UI that would otherwise be a long
+ * string of utilities repeated in many files.
+ * ------------------------------------------------------------------ */
+
+@layer components {
+  /* The glass panel used by every card in the app. */
+  .glass {
+    background: color-mix(in oklab, var(--color-panel) 78%, transparent);
+    border: 1px solid color-mix(in oklab, var(--color-violet) 34%, transparent);
+    border-radius: var(--radius-panel);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-violet) 12%, transparent),
+      0 18px 40px -24px color-mix(in oklab, var(--color-violet) 80%, transparent);
+  }
+
+  /* A brighter variant for the panel that is currently in focus. */
+  .glass-lit {
+    border-color: color-mix(in oklab, var(--color-mint) 55%, transparent);
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-mint) 30%, transparent),
+      0 0 34px -8px color-mix(in oklab, var(--color-mint) 55%, transparent);
+  }
+
+  /* The neon outline used on primary actions. */
+  .neon-ring {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-mint) 70%, transparent),
+      0 0 22px -4px color-mix(in oklab, var(--color-mint) 60%, transparent);
+  }
+
+  .neon-ring-gold {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-gold) 70%, transparent),
+      0 0 22px -4px color-mix(in oklab, var(--color-gold) 55%, transparent);
+  }
+
+  .neon-ring-rose {
+    box-shadow:
+      0 0 0 1px color-mix(in oklab, var(--color-rose) 70%, transparent),
+      0 0 22px -4px color-mix(in oklab, var(--color-rose) 55%, transparent);
+  }
+
+  /* Numeric readouts — the game is full of them. */
+  .tnum {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum' 1;
+  }
+}
+
+@layer utilities {
+  /* Safe-area padding for notched phones, in both directions. */
+  .pt-safe {
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+
+  .pb-safe {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .px-safe {
+    padding-inline: max(1rem, env(safe-area-inset-left), env(safe-area-inset-right));
+  }
+
+  /* A subtle grid used behind hero areas. */
+  .bg-grid {
+    background-image:
+      linear-gradient(
+        color-mix(in oklab, var(--color-violet) 10%, transparent) 1px,
+        transparent 1px
+      ),
+      linear-gradient(
+        90deg,
+        color-mix(in oklab, var(--color-violet) 10%, transparent) 1px,
+        transparent 1px
+      );
+    background-size: 32px 32px;
+  }
+}

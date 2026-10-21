@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Lint, typecheck, unit, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: G1 — lint
+        run: npm run lint
+
+      - name: G2 — format check
+        run: npm run format:check
+
+      - name: G3 — typecheck
+        run: npm run typecheck
+
+      - name: G4 — unit tests with coverage
+        run: npm run test:coverage
+
+      - name: G5 — build
+        run: npm run build
+
+      - name: G5 — bundle budget
+        run: npm run check:bundle
+
+      - name: G8 — contrast
+        run: npm run check:contrast
+
+  e2e:
+    name: E2E, a11y and RTL
+    runs-on: ubuntu-latest
+    needs: verify
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: G6 / G7 — e2e suite
+        run: npm run test:e2e
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7

@@ -1,0 +1,50 @@
+{
+  "name": "bulls-cows",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bulls & Cows — a multiplayer peer-to-peer number-guessing game. Static web app, WebRTC via PeerJS, no backend, no database.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "check:contrast": "node scripts/contrast-check.mjs",
+    "check:bundle": "node scripts/bundle-budget.mjs",
+    "verify": "npm run lint && npm run format:check && npm run typecheck && npm run test && npm run build && npm run check:contrast",
+    "dev:all": "node scripts/dev-all.mjs"
+  },
+  "dependencies": {
+    "peerjs": "1.5.5"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@tailwindcss/vite": "4.3.3",
+    "@types/node": "26.6.5",
+    "@vitest/coverage-v8": "5.0.5",
+    "eslint": "10.13.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.13.0",
+    "jsdom": "30.1.3",
+    "prettier": "3.9.10",
+    "tailwindcss": "4.3.3",
+    "typescript": "7.0.2",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

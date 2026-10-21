@@ -1,0 +1,193 @@
+/* ------------------------------------------------------------------ *
+ * Game motion
+ *
+ * Every animation here is decorative. Each one is disabled under
+ * `prefers-reduced-motion` — a decorative animation that cannot be turned
+ * off is a defect, not a feature.
+ * ------------------------------------------------------------------ */
+
+/* The digit tile that is waiting for the next keypress. */
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 2px color-mix(in oklab, var(--color-mint) 85%, transparent),
+      0 0 22px -2px color-mix(in oklab, var(--color-mint) 70%, transparent);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px color-mix(in oklab, var(--color-mint) 100%, transparent),
+      0 0 34px 2px color-mix(in oklab, var(--color-mint) 80%, transparent);
+  }
+}
+
+/* A digit landing in its tile. */
+@keyframes tile-commit {
+  0% {
+    transform: scale(0.82) translateY(4px);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.08) translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* The panel that announced a new turn. */
+@keyframes slide-in-top {
+  from {
+    transform: translateY(-14px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* The room-code chip, when a room is created. */
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  65% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* A correct guess landing in the attempts column. */
+@keyframes stamp-in {
+  0% {
+    transform: scale(0.7) rotate(-4deg);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.04) rotate(1deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* The win celebration glow behind the trophy. */
+@keyframes trophy-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 10px color-mix(in oklab, var(--color-gold) 55%, transparent));
+  }
+  50% {
+    filter: drop-shadow(0 0 30px color-mix(in oklab, var(--color-gold) 90%, transparent));
+  }
+}
+
+/* A gentle float for the mascot. */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+/* The reconnecting banner, sliding down from the top. */
+@keyframes drop-in {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* A slow shimmer across the winner's card. */
+@keyframes shimmer {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+.animate-breathe {
+  animation: breathe 1.6s var(--ease-snap) infinite;
+}
+
+.animate-tile-commit {
+  animation: tile-commit 260ms var(--ease-out-back);
+}
+
+.animate-slide-in-top {
+  animation: slide-in-top 320ms var(--ease-out-back);
+}
+
+.animate-pop-in {
+  animation: pop-in 480ms var(--ease-out-back);
+}
+
+.animate-stamp-in {
+  animation: stamp-in 340ms var(--ease-out-back);
+}
+
+.animate-trophy-glow {
+  animation: trophy-glow 2.4s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 4.5s ease-in-out infinite;
+}
+
+.animate-drop-in {
+  animation: drop-in 280ms var(--ease-out-back);
+}
+
+.animate-shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, var(--color-gold) 22%, transparent) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 3.2s linear infinite;
+}
+
+/* ------------------------------------------------------------------ *
+ * Reduced motion
+ *
+ * Honour the user's preference. Animations are removed, not just shortened —
+ * a looping animation that keeps moving is exactly what the setting asks us
+ * to stop.
+ * ------------------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-breathe,
+  .animate-float,
+  .animate-trophy-glow,
+  .animate-shimmer {
+    animation: none !important;
+  }
+}

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Bulls &amp; Cows</title>
+    <meta
+      name="description"
+      content="A multiplayer peer-to-peer number-guessing game. No accounts, no server, no database — just a room code."
+    />
+    <meta name="theme-color" content="#0c0533" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- Inline SVG favicon: no extra request, and it cannot break on a subpath deploy. -->
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230c0533'/%3E%3Cpath d='M16 20c0-6 4-10 6-10 1 4 0 8-2 11zM48 20c0-6-4-10-6-10-1 4 0 8 2 11z' fill='%23fbbf24'/%3E%3Ccircle cx='32' cy='36' r='16' fill='%23f4f1ff'/%3E%3Ccircle cx='25' cy='32' r='3' fill='%2305051a'/%3E%3Ccircle cx='39' cy='32' r='3' fill='%2305051a'/%3E%3Cellipse cx='32' cy='42' rx='6' ry='4' fill='%23e935c1'/%3E%3C/svg%3E"
+    />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400..800&family=Cairo:wght@400..900&family=JetBrains+Mono:wght@400..700&family=Nunito:wght@400..900&display=swap"
+    />
+  </head>
+  <body>
+    <div id="app" class="flex min-h-dvh flex-col">
+      <!-- The room code bar is pinned to the top on every screen. -->
+      <header id="room-bar" class="sticky top-0 z-30"></header>
+
+      <main id="screen-root" class="flex-1"></main>
+
+      <!-- Non-blocking notices. -->
+      <div
+        id="banner-root"
+        class="pointer-events-none fixed inset-x-0 top-0 z-50 flex flex-col items-center gap-2 px-4 pt-3"
+        role="status"
+        aria-live="polite"
+      ></div>
+      <div
+        id="toast-root"
+        class="pointer-events-none fixed inset-x-0 bottom-0 z-50 flex flex-col items-center gap-2 px-4 pb-6"
+        role="status"
+        aria-live="polite"
+      ></div>
+    </div>
+
+    <noscript>
+      <p style="padding: 2rem; text-align: center">
+        Bulls &amp; Cows needs JavaScript to run. Please enable it and reload the page.
+      </p>
+    </noscript>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
