@@ -36,6 +36,40 @@ test.describe('game', () => {
     await guestContext.close();
   });
 
+  test('a guest can win the game', async ({ page, browser }) => {
+    const host = page;
+    const code = await createRoom(host, 'CoderHamid');
+
+    const guestContext = await browser.newContext();
+    const guest = await guestContext.newPage();
+    await joinRoom(guest, code, 'Sara');
+
+    await host.locator('[data-action="start-game"]').click();
+    await expect(guest.locator('[data-screen="game"]')).toBeVisible({ timeout: 20_000 });
+
+    const secret = await secretOf(host);
+
+    // The Host plays first and misses, which hands the turn to the guest.
+    const miss = secret === '0247' ? '1359' : '0247';
+    await typeGuess(host, miss);
+    await submitGuess(host);
+
+    await expect(guest.getByTestId('turn-text')).toContainText(/your turn/i, { timeout: 20_000 });
+
+    // The guest solves it.
+    await typeGuess(guest, secret);
+    await submitGuess(guest);
+
+    await expect(guest.locator('[data-screen="result"]')).toBeVisible({ timeout: 20_000 });
+    await expect(guest.locator('h1')).toContainText(/you cracked it/i);
+    await expect(guest.getByTestId('secret')).toHaveText(secret);
+
+    // The Host sees the same result.
+    await expect(host.locator('[data-screen="result"]')).toBeVisible({ timeout: 20_000 });
+
+    await guestContext.close();
+  });
+
   test('a wrong guess is scored and the turn advances', async ({ page, browser }) => {
     const host = page;
     const code = await createRoom(host, 'CoderHamid');
