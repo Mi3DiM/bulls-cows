@@ -51,6 +51,7 @@ export const GUEST_MESSAGE_TYPES = Object.freeze([
 export const HOST_MESSAGE_TYPES = Object.freeze([
   MessageType.WELCOME,
   MessageType.STATE,
+  MessageType.CHAT,
   MessageType.TOAST,
   MessageType.NOTICE,
   MessageType.BYE,
@@ -69,6 +70,8 @@ export const HOST_MESSAGE_TYPES = Object.freeze([
  * @property {string} name
  * @property {number} avatar
  * @property {string} locale
+ * @property {string} clientId  A stable id for this browser, so a guest that
+ *   reconnects is recognised as the same player rather than a new one.
  */
 
 /**
@@ -108,6 +111,16 @@ export const HOST_MESSAGE_TYPES = Object.freeze([
  */
 
 /**
+ * @typedef {object} HostChatMessage
+ * @property {number} v
+ * @property {'chat'} t
+ * @property {string} from
+ * @property {string} name
+ * @property {string} text
+ * @property {number} at
+ */
+
+/**
  * @typedef {object} ToastMessage
  * @property {number} v
  * @property {'toast'} t
@@ -139,7 +152,7 @@ export const HOST_MESSAGE_TYPES = Object.freeze([
 
 /**
  * @typedef {HelloMessage | GuessMessage | ChatMessage | PingMessage} GuestMessage
- * @typedef {WelcomeMessage | StateMessage | ToastMessage | NoticeMessage | ByeMessage | PongMessage} HostMessage
+ * @typedef {WelcomeMessage | StateMessage | HostChatMessage | ToastMessage | NoticeMessage | ByeMessage | PongMessage} HostMessage
  */
 
 /**
@@ -260,8 +273,9 @@ export function parseGuestMessage(raw, context = {}) {
           : 0;
 
       const locale = parsed.locale === 'ar' ? 'ar' : 'en';
+      const clientId = sanitizeText(parsed.clientId, 64) ?? '';
 
-      return { ok: true, value: { v, t, name, avatar, locale } };
+      return { ok: true, value: { v, t, name, avatar, locale, clientId } };
     }
 
     case MessageType.GUESS: {
@@ -339,6 +353,15 @@ export function parseHostMessage(raw) {
         return { ok: false, reason: 'invalid-state' };
       }
       return { ok: true, value: { v, t, rev, state: parsed.state } };
+    }
+
+    case MessageType.CHAT: {
+      const from = typeof parsed.from === 'string' ? parsed.from : '';
+      const name = sanitizeText(parsed.name, MAX_NAME_LENGTH) ?? '';
+      const text = sanitizeText(parsed.text, MAX_CHAT_LENGTH);
+      if (text === null) return { ok: false, reason: 'invalid-text' };
+      const at = typeof parsed.at === 'number' ? parsed.at : 0;
+      return { ok: true, value: { v, t, from, name, text, at } };
     }
 
     case MessageType.TOAST: {

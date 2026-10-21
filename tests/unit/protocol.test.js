@@ -96,7 +96,7 @@ describe('parseGuestMessage', () => {
     );
     expect(result).toEqual({
       ok: true,
-      value: { v: 1, t: 'hello', name: 'Sara', avatar: 2, locale: 'ar' },
+      value: { v: 1, t: 'hello', name: 'Sara', avatar: 2, locale: 'ar', clientId: '' },
     });
   });
 
@@ -228,6 +228,36 @@ describe('parseHostMessage', () => {
       ok: false,
       reason: 'invalid-revision',
     });
+  });
+
+  it('parses a host chat message', () => {
+    const result = parseHostMessage(
+      JSON.stringify({
+        v: 1,
+        t: 'chat',
+        from: 'g1',
+        name: 'Sara',
+        text: 'Go Hamed!',
+        at: 1712345678901,
+      }),
+    );
+    expect(result).toEqual({
+      ok: true,
+      value: {
+        v: 1,
+        t: 'chat',
+        from: 'g1',
+        name: 'Sara',
+        text: 'Go Hamed!',
+        at: 1712345678901,
+      },
+    });
+  });
+
+  it('rejects a host chat message with no text', () => {
+    expect(
+      parseHostMessage(JSON.stringify({ v: 1, t: 'chat', from: 'g1', name: 'Sara', text: '  ' })),
+    ).toEqual({ ok: false, reason: 'invalid-text' });
   });
 
   it('parses a toast and rejects an unknown kind', () => {
