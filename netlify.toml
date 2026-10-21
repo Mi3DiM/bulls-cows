@@ -9,7 +9,9 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "22.12.0"
+  # Node 22.15 or newer: jsdom pulls in undici, which needs
+  # zlib.createZstdDecompress (added in Node 22.15).
+  NODE_VERSION = "24.16.0"
 
 # A single-page app: every path that is not a real file falls back to
 # index.html, so a shared link like /?room=K7P4 always loads.

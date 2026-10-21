@@ -4,6 +4,9 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "cleanUrls": true,
+  "engines": {
+    "node": "24.x"
+  },
   "headers": [
     {
       "source": "/assets/(.*)",
