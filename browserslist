@@ -1,0 +1,12 @@
+# Browser support
+#
+# The game needs WebRTC data channels, ES modules and CSS logical
+# properties. Those are all present in every current browser.
+
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+iOS 16.4+
+Chrome Android 120+
+Firefox for Android 120+
