@@ -58,12 +58,28 @@ export const MAX_PLAYERS = 8;
 export const ROOM_CODE_LENGTH = 4;
 
 /**
- * Room-code alphabet.
+ * Room-code alphabet — 26 symbols.
  *
- * Excludes `O`/`0`, `I`/`1` and `L` — the three pairs people confuse when a
- * code is read aloud or typed from a screenshot. 31 symbols.
+ * Every symbol that can be misread as another symbol is excluded:
+ *
+ * | Excluded | Confused with | Why it matters |
+ * |---|---|---|
+ * | `O` | `0` | classic misread |
+ * | `I`, `L` | `1` | classic misread |
+ * | `B` | `8` | letter/digit confusion |
+ * | `G` | `6` | letter/digit confusion |
+ * | `S` | `5` | letter/digit confusion |
+ * | `T` | `7` | letter/digit confusion |
+ * | `Z` | `2` | letter/digit confusion |
+ *
+ * Digits `0` and `1` are excluded outright. The result is a set in which no
+ * letter resembles any digit, so a code read aloud over a phone call is
+ * unambiguous.
+ *
+ * 26⁴ = 456,976 codes. Collisions are possible but self-healing: the Host
+ * regenerates a taken code automatically (see ADR 0002).
  */
-export const ROOM_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+export const ROOM_CODE_ALPHABET = 'ACDEFHJKMNPQRUVWXY23456789';
 
 export const DEFAULT_RULES = Object.freeze({
   digits: 4,
