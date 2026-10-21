@@ -204,6 +204,30 @@ export function setPlayerStatus(state, playerId, status) {
 }
 
 /**
+ * Changes a player's name and avatar.
+ *
+ * Used when a player who was disconnected comes back — they may have picked
+ * a different name in the meantime.
+ *
+ * @param {GameState} state
+ * @param {string} playerId
+ * @param {string} name
+ * @param {number} avatar
+ * @returns {GameState}
+ */
+export function renamePlayer(state, playerId, name, avatar) {
+  let changed = false;
+  const players = state.players.map((p) => {
+    if (p.id !== playerId) return p;
+    if (p.name === name && p.avatar === avatar) return p;
+    changed = true;
+    return { ...p, name, avatar };
+  });
+  if (!changed) return state;
+  return bump({ ...state, players });
+}
+
+/**
  * Finds a player by id.
  *
  * @param {GameState} state

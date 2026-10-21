@@ -31,19 +31,43 @@ function revisionOf(state) {
 }
 
 /**
- * Creates a stable id for this browser session.
+ * Creates a stable id for this browser tab.
+ *
+ * It is kept in `sessionStorage`, so it survives a reload — a player who
+ * refreshes the page keeps their seat instead of arriving as a second copy
+ * of themselves. It is scoped to the tab, so two players on the same device
+ * are still two players.
  *
  * @returns {string}
  */
 function createClientId() {
+  const KEY = 'bulls-cows:client-id';
+
   try {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-      return crypto.randomUUID();
-    }
+    const stored = window.sessionStorage.getItem(KEY);
+    if (stored) return stored;
   } catch {
-    // Not available. Fall through to a random string.
+    // Storage disabled. A per-page id is still better than none.
   }
-  return `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+
+  /** @type {string} */
+  let id;
+  try {
+    id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  } catch {
+    id = `c${Date.now().toString(36)}${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  try {
+    window.sessionStorage.setItem(KEY, id);
+  } catch {
+    // Storage disabled.
+  }
+
+  return id;
 }
 
 /**

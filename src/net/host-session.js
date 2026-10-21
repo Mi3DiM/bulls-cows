@@ -8,7 +8,13 @@
  * See `docs/adr/0003-host-authoritative-state.md`.
  */
 
-import { CODE_REGENERATION_ATTEMPTS, HEARTBEAT_MS, MAX_PLAYERS, SEAT_HOLD_MS } from '../config.js';
+import {
+  CODE_REGENERATION_ATTEMPTS,
+  GUEST_TIMEOUT_MS,
+  HEARTBEAT_MS,
+  MAX_PLAYERS,
+  SEAT_HOLD_MS,
+} from '../config.js';
 import { MessageType, encodeMessage, parseGuestMessage } from '../core/protocol.js';
 import { generateRoomCode } from '../core/room-code.js';
 import {
@@ -17,8 +23,10 @@ import {
   addPlayer,
   applyGuess,
   createInitialState,
+  findPlayer,
   publicView,
   removePlayer,
+  renamePlayer,
   setPlayerStatus,
   startGame,
 } from '../core/state.js';
@@ -42,6 +50,7 @@ import { LinkFailure, LinkState, PeerLink } from './peer-link.js';
  * @property {number} [maxPlayers]
  * @property {number} [heartbeatMs]
  * @property {number} [seatHoldMs]
+ * @property {number} [guestTimeoutMs]
  * @property {number} [codeAttempts]
  */
 
@@ -53,6 +62,7 @@ import { LinkFailure, LinkState, PeerLink } from './peer-link.js';
  * @property {string} locale
  * @property {DataConnectionLike} connection
  * @property {ReturnType<typeof setTimeout> | null} holdTimer
+ * @property {number} lastSeen  When the Host last heard from this guest.
  */
 
 /** The Host's own player id. */
@@ -76,6 +86,9 @@ export class HostSession extends Emitter {
 
   /** @type {Map<string, string>} Client id to player id, for reconnects. */
   #clients = new Map();
+
+  /** @type {Map<string, ReturnType<typeof setTimeout>>} Player id to seat-hold timer. */
+  #holdTimers = new Map();
 
   /** @type {GameState} */
   #state;
@@ -273,6 +286,12 @@ export class HostSession extends Emitter {
 
     const message = parsed.value;
 
+    // Any message at all proves the guest is alive.
+    const guest = this.#findGuest(connection);
+    if (guest) {
+      guest.lastSeen = Date.now();
+    }
+
     switch (message.t) {
       case MessageType.HELLO:
         this.#handleHello(connection, message);
@@ -311,14 +330,41 @@ export class HostSession extends Emitter {
       if (knownPlayerId) {
         const existing = this.#guests.get(knownPlayerId);
         if (existing) {
-          if (existing.holdTimer) clearTimeout(existing.holdTimer);
-          existing.connection = connection;
-          existing.holdTimer = null;
-
-          this.#state = setPlayerStatus(this.#state, knownPlayerId, PlayerStatus.ACTIVE);
+          // The same connection, saying hello again. It keeps its identity.
           this.#sendTo(connection, {
             t: 'welcome',
             you: { id: knownPlayerId, name: existing.name, avatar: existing.avatar },
+            state: publicView(this.#state),
+          });
+          return;
+        }
+
+        // A player who is known but not currently connected is coming
+        // back. They keep their seat rather than appearing twice.
+        const player = findPlayer(this.#state, knownPlayerId);
+        if (player) {
+          const holdTimer = this.#holdTimers.get(knownPlayerId);
+          if (holdTimer) {
+            clearTimeout(holdTimer);
+            this.#holdTimers.delete(knownPlayerId);
+          }
+
+          this.#guests.set(knownPlayerId, {
+            id: knownPlayerId,
+            name: message.name,
+            avatar: message.avatar,
+            locale: message.locale,
+            connection,
+            holdTimer: null,
+            lastSeen: Date.now(),
+          });
+
+          this.#state = setPlayerStatus(this.#state, knownPlayerId, PlayerStatus.ACTIVE);
+          this.#state = renamePlayer(this.#state, knownPlayerId, message.name, message.avatar);
+
+          this.#sendTo(connection, {
+            t: 'welcome',
+            you: { id: knownPlayerId, name: message.name, avatar: message.avatar },
             state: publicView(this.#state),
           });
           this.#publishState();
@@ -353,6 +399,7 @@ export class HostSession extends Emitter {
       locale: message.locale,
       connection,
       holdTimer: null,
+      lastSeen: Date.now(),
     };
 
     this.#guests.set(id, guest);
@@ -456,20 +503,56 @@ export class HostSession extends Emitter {
     this.#guests.delete(guest.id);
 
     if (this.#state.phase !== Phase.FINISHED) {
-      this.#state = setPlayerStatus(this.#state, guest.id, PlayerStatus.DISCONNECTED);
-      this.#publishState();
-
-      const holdMs = this.#options.seatHoldMs ?? SEAT_HOLD_MS;
-      const timer = setTimeout(() => {
-        this.#state = removePlayer(this.#state, guest.id);
-        this.#publishState();
-        this.emit('notice', { kind: 'player-left', text: guest.name });
-      }, holdMs);
-      if (typeof timer === 'object' && 'unref' in timer) timer.unref();
-      guest.holdTimer = timer;
+      this.#markDisconnected(guest);
     } else {
       this.#state = removePlayer(this.#state, guest.id);
       this.#publishState();
+    }
+  }
+
+  /**
+   * Marks a guest as disconnected and holds their seat.
+   *
+   * @param {ConnectedPlayer} guest
+   */
+  #markDisconnected(guest) {
+    if (guest.holdTimer) return;
+
+    this.#state = setPlayerStatus(this.#state, guest.id, PlayerStatus.DISCONNECTED);
+    this.#publishState();
+
+    const holdMs = this.#options.seatHoldMs ?? SEAT_HOLD_MS;
+    const timer = setTimeout(() => {
+      this.#holdTimers.delete(guest.id);
+      this.#state = removePlayer(this.#state, guest.id);
+      this.#publishState();
+      this.emit('notice', { kind: 'player-left', text: guest.name });
+    }, holdMs);
+    if (typeof timer === 'object' && 'unref' in timer) timer.unref();
+    guest.holdTimer = timer;
+    this.#holdTimers.set(guest.id, timer);
+  }
+
+  /**
+   * Marks guests that have gone quiet as disconnected.
+   *
+   * A tab that closes abruptly does not always deliver a "close" event — the
+   * WebRTC connection simply dies. The guests ping the Host, so silence is
+   * the reliable signal that one has gone.
+   */
+  #sweepSilentGuests() {
+    if (this.#closed) return;
+    if (this.#state.phase === Phase.FINISHED) return;
+
+    const timeout = this.#options.guestTimeoutMs ?? GUEST_TIMEOUT_MS;
+    const now = Date.now();
+
+    for (const guest of [...this.#guests.values()]) {
+      if (guest.holdTimer) continue;
+      if (now - guest.lastSeen < timeout) continue;
+
+      this.#guests.delete(guest.id);
+      this.#markDisconnected(guest);
     }
   }
 
@@ -624,6 +707,7 @@ export class HostSession extends Emitter {
     this.#heartbeatTimer = setInterval(() => {
       if (this.#closed) return;
       this.#publishState();
+      this.#sweepSilentGuests();
     }, interval);
     if (typeof this.#heartbeatTimer === 'object' && 'unref' in this.#heartbeatTimer) {
       this.#heartbeatTimer.unref();

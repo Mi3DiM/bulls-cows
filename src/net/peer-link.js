@@ -19,7 +19,7 @@
  * See `docs/adr/0004-connection-resilience.md`.
  */
 
-import { CONNECT_TIMEOUT_MS, RETRY_DELAYS_MS } from '../config.js';
+import { CONNECT_TIMEOUT_MS, GUEST_PING_MS, RETRY_DELAYS_MS } from '../config.js';
 import { Emitter } from './emitter.js';
 
 /**
@@ -431,7 +431,7 @@ export class PeerLink extends Emitter {
    */
   #startHeartbeat() {
     if (this.#heartbeatTimer) return;
-    const interval = this.#options.heartbeatMs ?? 15_000;
+    const interval = this.#options.heartbeatMs ?? GUEST_PING_MS;
     this.#heartbeatTimer = setInterval(() => {
       if (this.#connection?.open) {
         this.send(JSON.stringify({ v: 1, t: 'ping' }));

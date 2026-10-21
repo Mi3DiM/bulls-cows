@@ -220,9 +220,9 @@ export class App {
       name: this.#playerName === 'Player' ? '' : this.#playerName,
       avatar: this.#playerAvatar,
       onJoin: (name, avatarIndex) => {
-        this.#playerName = name;
-        this.#playerAvatar = avatarIndex;
-        this.#hasName = true;
+        // Through the setter, so the name is remembered and a returning
+        // player does not have to type it again.
+        this.setPlayerName(name, avatarIndex);
         void this.joinRoom(code);
       },
       onLanguageChange: () => this.#renderJoin(code),

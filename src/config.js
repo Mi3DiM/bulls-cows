@@ -42,6 +42,24 @@ export const HEARTBEAT_MS = 5_000;
 /** How long a disconnected player's seat is held before they are removed. */
 export const SEAT_HOLD_MS = 60_000;
 
+/**
+ * How often a guest pings the Host to prove it is still there.
+ *
+ * A tab that closes abruptly does not always deliver a "close" event — the
+ * WebRTC connection simply dies. The ping is how the Host learns that a
+ * guest is gone.
+ */
+export const GUEST_PING_MS = 10_000;
+
+/**
+ * How long the Host waits for a guest to say something before it treats them
+ * as gone.
+ *
+ * Must be comfortably longer than {@link GUEST_PING_MS}, so one lost packet
+ * does not cost a player their seat.
+ */
+export const GUEST_TIMEOUT_MS = 25_000;
+
 /** How long a guest may go without a snapshot before it shows the reconnecting banner. */
 export const STALE_MS = 12_000;
 
