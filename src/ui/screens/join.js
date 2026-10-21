@@ -25,26 +25,26 @@ import { createLanguageToggle } from '../components/language-toggle.js';
  * @param {() => void} [options.onLanguageChange]
  */
 export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, onLanguageChange }) {
-  const screen = el('div.mx-auto.flex.w-full.max-w-md.flex-col.gap-4.px-4.py-8', {
+  const screen = el('div mx-auto flex w-full max-w-md flex-col gap-4 px-4 py-8', {
     'data-screen': 'join',
   });
 
-  const head = el('header.flex.flex-col.items-center.gap-2.text-center', {}, [
-    el('p.text-xs.font-bold.uppercase.tracking-widest.text-muted', { text: t('create.codeLabel') }),
-    el('p.tnum.text-4xl.font-extrabold.tracking-[0.3em].text-mint', {
+  const head = el('header flex flex-col items-center gap-2 text-center', {}, [
+    el('p text-xs font-bold uppercase tracking-widest text-muted', { text: t('create.codeLabel') }),
+    el('p tnum text-4xl font-extrabold tracking-[0.3em] text-mint', {
       text: code,
       'data-testid': 'join-room-code',
     }),
-    el('p.text-sm.text-muted', { text: t('home.join.title') }),
+    el('p text-sm text-muted', { text: t('home.join.title') }),
   ]);
 
-  const nameLabel = el('label.block.text-xs.font-bold.uppercase.tracking-wider.text-muted', {
+  const nameLabel = el('label block text-xs font-bold uppercase tracking-wider text-muted', {
     text: t('common.name'),
     for: 'join-name',
   });
 
   const nameInput = elInput({
-    class: 'w-full.rounded-xl.border.border-violet/25.bg-panel-soft.px-3.py-2.5.text-sm',
+    class: 'w-full rounded-xl border border-violet/25 bg-panel-soft px-3 py-2.5 text-sm',
     type: 'text',
     id: 'join-name',
     maxlength: '24',
@@ -58,7 +58,7 @@ export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, o
 
   let chosen = selectedAvatar;
 
-  const avatarRow = el('div.flex.flex-wrap.gap-2', {
+  const avatarRow = el('div flex flex-wrap gap-2', {
     role: 'radiogroup',
     'aria-label': t('common.name'),
   });
@@ -78,7 +78,7 @@ export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, o
 
   for (let i = 0; i < AVATAR_COUNT; i += 1) {
     const button = el(
-      'button.flex.h-11.w-11.items-center.justify-center.rounded-full.transition-all',
+      'button flex h-11 w-11 items-center justify-center rounded-full transition-all',
       {
         type: 'button',
         role: 'radio',
@@ -101,7 +101,7 @@ export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, o
   syncAvatars();
 
   const joinButton = el(
-    'button.w-full.rounded-2xl.bg-mint.px-5.py-3.5.text-base.font-extrabold.text-void.transition-transform.active:scale-[0.98]',
+    'button w-full rounded-2xl bg-mint px-5 py-3.5 text-base font-extrabold text-void transition-transform active:scale-[0.98]',
     { type: 'button', 'data-action': 'join-room' },
     [t('home.join.cta')],
   );
@@ -119,7 +119,7 @@ export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, o
     }
   });
 
-  const card = el('section.glass.flex.flex-col.gap-4.p-5', {}, [
+  const card = el('section glass flex flex-col gap-4 p-5', {}, [
     nameLabel,
     nameInput,
     avatarRow,
@@ -129,7 +129,7 @@ export function createJoinScreen({ code, name, avatar: selectedAvatar, onJoin, o
   screen.append(
     head,
     card,
-    el('div.flex.justify-center', {}, [createLanguageToggle(onLanguageChange)]),
+    el('div flex justify-center', {}, [createLanguageToggle(onLanguageChange)]),
   );
 
   // Focus the name field so the guest can type straight away.

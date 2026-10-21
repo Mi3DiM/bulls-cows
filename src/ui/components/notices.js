@@ -36,13 +36,16 @@ export function showBanner(root, { text, hint, kind = 'info', autoDismissMs = 0 
   };
 
   const banner = el(
-    `div.glass.animate-drop-in.pointer-events-auto.flex.w-full.max-w-md.items-start.gap-3.rounded-2xl.border.px-4.py-3 ${tones[kind]}`,
-    { role: 'status' },
+    'div',
+    {
+      class: `glass animate-drop-in pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-2xl border px-4 py-3 ${tones[kind]}`,
+      role: 'status',
+    },
     [
-      el('span.mt-0.5.shrink-0', {}, [icon(kind === 'error' ? 'warning' : 'sparkle', 20)]),
-      el('div.min-w-0.flex-1', {}, [
-        el('p.text-sm.font-bold', { text }),
-        hint ? el('p.mt-0.5.text-xs.opacity-80', { text: hint }) : null,
+      el('span mt-0.5 shrink-0', {}, [icon(kind === 'error' ? 'warning' : 'sparkle', 20)]),
+      el('div min-w-0 flex-1', {}, [
+        el('p text-sm font-bold', { text }),
+        hint ? el('p mt-0.5 text-xs opacity-80', { text: hint }) : null,
       ]),
     ],
   );

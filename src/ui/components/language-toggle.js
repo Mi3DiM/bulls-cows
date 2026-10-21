@@ -16,7 +16,7 @@ import { t, getLocale, setLocale, LOCALES } from '../../i18n/index.js';
  */
 export function createLanguageToggle(onChange) {
   const group = el(
-    'div.inline-flex.items-center.gap-0.5.rounded-xl.border.border-violet/25.bg-panel-soft.p-1',
+    'div inline-flex items-center gap-0.5 rounded-xl border border-violet/25 bg-panel-soft p-1',
     { role: 'group', 'aria-label': t('common.language') },
   );
 
@@ -24,7 +24,7 @@ export function createLanguageToggle(onChange) {
 
   for (const locale of LOCALES) {
     const button = el(
-      'button.rounded-lg.px-2.5.py-1.text-xs.font-bold.transition-colors',
+      'button rounded-lg px-2.5 py-1 text-xs font-bold transition-colors',
       {
         type: 'button',
         'data-locale': locale.id,

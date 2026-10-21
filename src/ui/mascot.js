@@ -203,10 +203,17 @@ export function mascot(state = 'idle', size = 180) {
     }),
   );
 
-  // Patches.
+  // Patches. Kept clear of the eyes so the expression always reads.
   root.append(
-    svg('ellipse', { cx: 64, cy: 62, rx: 21, ry: 17, fill: '#1a0b3d' }),
-    svg('ellipse', { cx: 140, cy: 98, rx: 16, ry: 13, fill: '#1a0b3d' }),
+    svg('ellipse', {
+      cx: 58,
+      cy: 46,
+      rx: 19,
+      ry: 15,
+      fill: '#1a0b3d',
+      transform: 'rotate(-18 58 46)',
+    }),
+    svg('ellipse', { cx: 142, cy: 118, rx: 16, ry: 13, fill: '#1a0b3d' }),
   );
 
   root.append(face(state));

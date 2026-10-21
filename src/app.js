@@ -564,11 +564,11 @@ export class App {
     this.#renderRoomBar();
 
     this.options.screenRoot.append(
-      el('div.flex.flex-1.items-center.justify-center.px-4', {}, [
-        el('div.glass.flex.flex-col.items-center.gap-3.p-8.text-center', {}, [
-          el('span.animate-breathe.h-4.w-4.rounded-full.bg-mint', { 'aria-hidden': 'true' }),
-          el('p.font-display.text-lg.font-extrabold', { text: t('app.loading') }),
-          el('p.text-xs.text-muted', { text: t('create.waitingHint') }),
+      el('div flex flex-1 items-center justify-center px-4', {}, [
+        el('div glass flex flex-col items-center gap-3 p-8 text-center', {}, [
+          el('span animate-breathe h-4 w-4 rounded-full bg-mint', { 'aria-hidden': 'true' }),
+          el('p font-display text-lg font-extrabold', { text: t('app.loading') }),
+          el('p text-xs text-muted', { text: t('create.waitingHint') }),
         ]),
       ]),
     );
@@ -589,6 +589,7 @@ export class App {
 
     const room = createRoomScreen({
       state,
+      code: this.#code ?? '',
       selfId: this.#selfId(),
       isHost,
       onChat: (text) => {
@@ -691,17 +692,17 @@ export class App {
     this.#renderRoomBar();
 
     const home = el(
-      'div.flex.flex-1.items-center.justify-center.px-4.py-8',
+      'div flex flex-1 items-center justify-center px-4 py-8',
       {
         'data-screen': 'ended',
       },
       [
-        el('section.glass.flex.max-w-md.flex-col.items-center.gap-3.p-8.text-center', {}, [
-          el('span.text-rose', {}, [icon('warning', 40)]),
-          el('h1.font-display.text-2xl.font-extrabold', { text: title }),
-          el('p.text-sm.text-muted', { text: hint }),
+        el('section glass flex max-w-md flex-col items-center gap-3 p-8 text-center', {}, [
+          el('span text-rose', {}, [icon('warning', 40)]),
+          el('h1 font-display text-2xl font-extrabold', { text: title }),
+          el('p text-sm text-muted', { text: hint }),
           el(
-            'button.mt-2.rounded-2xl.bg-violet.px-6.py-3.text-base.font-extrabold.text-text',
+            'button mt-2 rounded-2xl bg-violet px-6 py-3 text-base font-extrabold text-text',
             { type: 'button', 'data-action': 'back-home' },
             [t('result.backHome')],
           ),
@@ -721,25 +722,32 @@ export class App {
    * still say the old thing.
    */
   #rerender() {
+    // The screen is rebuilt from scratch, so the scroll position would be
+    // lost. It is restored, so switching language does not throw the player
+    // back to the top of a screen they were reading.
+    const scrollY = window.scrollY;
+
     switch (this.#screen) {
       case 'join':
         this.#renderJoin(this.#code ?? '');
-        return;
+        break;
       case 'room':
         this.#renderRoom();
-        return;
+        break;
       case 'game':
         this.#renderGame();
-        return;
+        break;
       case 'result':
         this.#renderResult();
-        return;
+        break;
       case 'ended':
         this.#renderEnded(t('game.hostLeft'), t('game.hostLeftHint'));
-        return;
+        break;
       default:
         this.#renderHome();
     }
+
+    window.scrollTo({ top: scrollY });
   }
 
   /**
@@ -772,23 +780,27 @@ export class App {
     const code = this.#code ?? '';
     const url = this.#shareUrl();
 
-    const bar = el('div.flex.items-center.gap-3', {}, []);
+    const bar = el('div flex items-center gap-3', {}, []);
 
-    const chip = el('div.flex.items-center.gap-2.rounded-xl.bg-violet-deep/60.px-3.py-1.5', {}, [
-      el('span.text-faint.text-xs.font-semibold.uppercase.tracking-wider', {
-        text: t('create.codeLabel'),
-      }),
-      el('span.tnum.text-xl.font-extrabold.tracking-[0.3em].text-mint', {
-        text: code,
-        'data-testid': 'room-code',
-        'aria-label': `${t('create.codeLabel')}: ${code.split('').join(' ')}`,
-      }),
-    ]);
+    const chip = el(
+      'div flex items-center gap-2 rounded-xl bg-violet-deep/60 px-2.5 py-1.5 sm:px-3',
+      {},
+      [
+        el('span hidden text-faint text-xs font-semibold uppercase tracking-wider sm:inline', {
+          text: t('create.codeLabel'),
+        }),
+        el('span tnum text-lg font-extrabold tracking-[0.3em] text-mint sm:text-xl', {
+          text: code,
+          'data-testid': 'room-code',
+          'aria-label': `${t('create.codeLabel')}: ${code.split('').join(' ')}`,
+        }),
+      ],
+    );
 
-    const actions = el('div.ms-auto.flex.items-center.gap-2');
+    const actions = el('div ms-auto flex items-center gap-1.5 sm:gap-2');
 
     const copy = el(
-      'button.inline-flex.h-11.w-11.items-center.justify-center.rounded-xl.bg-panel-soft.text-text.transition-colors.hover:bg-violet-deep',
+      'button inline-flex h-10 w-10 items-center justify-center rounded-xl bg-panel-soft text-text transition-colors hover:bg-violet-deep sm:h-11 sm:w-11',
       {
         type: 'button',
         'data-action': 'copy-link',
@@ -800,7 +812,7 @@ export class App {
     copy.addEventListener('click', () => void this.copyLink());
 
     const share = el(
-      'button.inline-flex.h-11.w-11.items-center.justify-center.rounded-xl.bg-panel-soft.text-text.transition-colors.hover:bg-violet-deep',
+      'button inline-flex h-10 w-10 items-center justify-center rounded-xl bg-panel-soft text-text transition-colors hover:bg-violet-deep sm:h-11 sm:w-11',
       {
         type: 'button',
         'data-action': 'share',
@@ -812,7 +824,7 @@ export class App {
     share.addEventListener('click', () => void this.share());
 
     const leave = el(
-      'button.inline-flex.h-11.w-11.items-center.justify-center.rounded-xl.bg-rose-deep/40.text-rose.transition-colors.hover:bg-rose-deep/70',
+      'button inline-flex h-10 w-10 items-center justify-center rounded-xl bg-rose-deep/40 text-rose transition-colors hover:bg-rose-deep/70 sm:h-11 sm:w-11',
       {
         type: 'button',
         'data-action': 'leave',

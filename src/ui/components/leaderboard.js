@@ -21,16 +21,16 @@ import { rankedPlayers, starRating } from '../../core/state.js';
  * @returns {HTMLElement}
  */
 export function createLeaderboard({ state, selfId }) {
-  const board = el('section.flex.flex-col.gap-3', { 'data-testid': 'leaderboard' });
+  const board = el('section flex flex-col gap-3', { 'data-testid': 'leaderboard' });
 
   board.append(
-    el('div.flex.items-center.gap-2', {}, [
+    el('div flex items-center gap-2', {}, [
       icon('trophy', 18),
-      el('h2.font-display.text-lg.font-extrabold', { text: t('game.leaderboard') }),
+      el('h2 font-display text-lg font-extrabold', { text: t('game.leaderboard') }),
     ]),
   );
 
-  const list = el('ol.flex.flex-col.gap-2', { 'data-testid': 'leaderboard-list' });
+  const list = el('ol flex flex-col gap-2', { 'data-testid': 'leaderboard-list' });
   board.append(list);
 
   renderLeaderboard(list, state, selfId);
@@ -54,7 +54,7 @@ export function renderLeaderboard(list, state, selfId) {
     const rating = starRating(player.points);
 
     const row = el(
-      'li.flex.items-center.gap-2.5.rounded-xl.border.border-violet/20.bg-panel-soft/50.px-3.py-2',
+      'li flex items-center gap-2.5 rounded-xl border border-violet/20 bg-panel-soft/50 px-3 py-2',
       { 'data-rank': String(index + 1) },
     );
 
@@ -63,12 +63,12 @@ export function renderLeaderboard(list, state, selfId) {
     }
 
     row.append(
-      el('span.tnum.w-4.text-center.text-xs.font-bold.text-faint', { text: `${index + 1}` }),
+      el('span tnum w-4 text-center text-xs font-bold text-faint', { text: `${index + 1}` }),
       avatar(player.avatar, 30),
-      el('span.min-w-0.flex-1.truncate.text-sm.font-bold', { text: player.name }),
-      el('span.flex.items-center.gap-0.5.text-gold', { 'aria-label': `${rating} / 5` }, [
-        el('span.tnum.text-sm.font-extrabold', { text: String(player.points) }),
-        el('span.text-[10px].opacity-80', { text: '★' }),
+      el('span min-w-0 flex-1 truncate text-sm font-bold', { text: player.name }),
+      el('span flex items-center gap-0.5 text-gold', { 'aria-label': `${rating} / 5` }, [
+        el('span tnum text-sm font-extrabold', { text: String(player.points) }),
+        el('span text-[10px] opacity-80', { text: '★' }),
       ]),
     );
 

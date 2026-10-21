@@ -67,6 +67,7 @@ describe('the interface renders without throwing', () => {
     const state = sampleState();
     const screen = createRoomScreen({
       state,
+      code: 'K7P4',
       selfId: 'host',
       isHost: true,
       onChat: () => {},

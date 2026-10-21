@@ -29,27 +29,27 @@ import { createChat } from '../components/chat.js';
  * @param {(text: string) => void} options.onChat
  */
 export function createGameScreen({ state, selfId, onGuess, onChat }) {
-  const screen = el('div.flex.w-full.flex-1.flex-col', { 'data-screen': 'game' });
+  const screen = el('div flex w-full flex-1 flex-col', { 'data-screen': 'game' });
 
   /* --- turn banner --- */
 
   const banner = el(
-    'div.glass.flex.items-center.gap-3.rounded-none.border-x-0.border-t-0.px-4.py-3',
+    'div glass flex items-center gap-3 rounded-none border-x-0 border-t-0 px-4 py-3',
     { 'data-testid': 'turn-banner' },
   );
 
-  const bannerIcon = el('span.shrink-0.text-mint');
-  const bannerText = el('p.font-display.text-lg.font-extrabold', { 'data-testid': 'turn-text' });
-  const bannerSub = el('p.text-xs.text-muted');
+  const bannerIcon = el('span shrink-0 text-mint');
+  const bannerText = el('p font-display text-lg font-extrabold', { 'data-testid': 'turn-text' });
+  const bannerSub = el('p text-xs text-muted');
 
-  const bannerBody = el('div.min-w-0.flex-1', {}, [bannerText, bannerSub]);
+  const bannerBody = el('div min-w-0 flex-1', {}, [bannerText, bannerSub]);
   banner.append(bannerIcon, bannerBody);
 
   /* --- the centre column --- */
 
-  const centre = el('div.mx-auto.flex.w-full.max-w-md.flex-col.gap-3.px-4.py-4');
+  const centre = el('div mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4');
 
-  const mascotWrap = el('div.flex.justify-center', {}, [mascot('idle', 130)]);
+  const mascotWrap = el('div flex justify-center', {}, [mascot('idle', 130)]);
   const mascotNode = /** @type {SVGSVGElement} */ (mascotWrap.firstElementChild);
 
   const guessPanel = createGuessPanel({
@@ -62,35 +62,35 @@ export function createGameScreen({ state, selfId, onGuess, onChat }) {
 
   /* --- panels --- */
 
-  const playersCard = el('section.glass.flex.flex-col.gap-3.p-4');
-  playersCard.append(el('h2.font-display.text-lg.font-extrabold', { text: t('lobby.players') }));
-  const playerList = el('div.flex.flex-col.gap-2', { 'data-testid': 'player-list' });
+  const playersCard = el('section glass flex flex-col gap-3 p-4');
+  playersCard.append(el('h2 font-display text-lg font-extrabold', { text: t('lobby.players') }));
+  const playerList = el('div flex flex-col gap-2', { 'data-testid': 'player-list' });
   playersCard.append(playerList);
 
-  const historyCard = el('section.glass.flex.flex-col.p-4');
+  const historyCard = el('section glass flex flex-col p-4');
   const attempts = createAttemptsBoard({ state, selfId });
   historyCard.append(attempts);
 
-  const leaderboardCard = el('section.glass.flex.flex-col.p-4');
+  const leaderboardCard = el('section glass flex flex-col p-4');
   const leaderboard = createLeaderboard({ state, selfId });
   leaderboardCard.append(leaderboard);
 
   const chat = createChat({ onSend: onChat });
-  const chatCard = el('section.glass.flex.flex-col.p-4', {}, [chat.element]);
+  const chatCard = el('section glass flex flex-col p-4', {}, [chat.element]);
 
   const panels = {
-    players: el('div.flex.flex-col.gap-4', { 'data-panel': 'players' }, [playersCard]),
-    history: el('div.flex.flex-col.gap-4', { 'data-panel': 'history' }, [
+    players: el('div flex flex-col gap-4', { 'data-panel': 'players' }, [playersCard]),
+    history: el('div flex flex-col gap-4', { 'data-panel': 'history' }, [
       historyCard,
       leaderboardCard,
     ]),
-    chat: el('div.flex.flex-col.gap-4', { 'data-panel': 'chat' }, [chatCard]),
+    chat: el('div flex flex-col gap-4', { 'data-panel': 'chat' }, [chatCard]),
   };
 
   /* --- tab bar --- */
 
   const tabBar = el(
-    'div.glass.sticky.bottom-0.z-20.grid.grid-cols-3.gap-1.rounded-none.border-x-0.border-b-0.p-2.lg:hidden',
+    'div glass sticky bottom-0 z-20 grid grid-cols-3 gap-1 rounded-none border-x-0 border-b-0 p-2 lg:hidden',
     { role: 'tablist', 'data-testid': 'tab-bar' },
   );
 
@@ -109,7 +109,7 @@ export function createGameScreen({ state, selfId, onGuess, onChat }) {
 
   for (const tab of tabData) {
     const button = el(
-      'button.flex.flex-col.items-center.gap-0.5.rounded-xl.px-2.py-1.5.text-[11px].font-bold.transition-colors',
+      'button flex flex-col items-center gap-0.5 rounded-xl px-2 py-1.5 text-[11px] font-bold transition-colors',
       {
         type: 'button',
         role: 'tab',
@@ -153,12 +153,12 @@ export function createGameScreen({ state, selfId, onGuess, onChat }) {
   /* --- layout --- */
 
   const body = el(
-    'div.mx-auto.grid.w-full.max-w-7xl.flex-1.gap-4.px-4.pb-4.lg:grid-cols-[17rem_minmax(0,1fr)_20rem]',
+    'div mx-auto grid w-full max-w-7xl flex-1 gap-4 px-4 pb-4 lg:grid-cols-[17rem_minmax(0,1fr)_20rem]',
     {},
     [
-      el('div.flex.flex-col.gap-4', {}, [panels.players, panels.chat]),
+      el('div flex flex-col gap-4', {}, [panels.players, panels.chat]),
       centre,
-      el('div.flex.flex-col.gap-4', {}, [panels.history]),
+      el('div flex flex-col gap-4', {}, [panels.history]),
     ],
   );
 

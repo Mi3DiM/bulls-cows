@@ -66,13 +66,14 @@ const KNOWN_TAGS = new Set([
 /**
  * Creates an element.
  *
- * @param {string} tag  A tag name, optionally followed by a `class` shorthand.
+ * @param {string} tag  A tag name, optionally followed by a space-separated
+ *   class list: `'button flex items-center'`.
  * @param {Record<string, unknown>} [props]
  * @param {(Node | string | null | undefined)[]} [children]
  * @returns {HTMLElement}
  */
 export function el(tag, props = {}, children = []) {
-  const [name, ...classes] = tag.split('.');
+  const [name, ...classes] = tag.split(/\s+/).filter((part) => part.length > 0);
   const elementName = name || 'div';
 
   if (!KNOWN_TAGS.has(elementName)) {

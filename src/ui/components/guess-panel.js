@@ -26,29 +26,29 @@ export function createGuessPanel({ digitCount, enabled, onSubmit, onChange }) {
 
   let isEnabled = enabled;
 
-  const panel = el('section.flex.flex-col.gap-4', { 'data-testid': 'guess-panel' });
+  const panel = el('section flex flex-col gap-4', { 'data-testid': 'guess-panel' });
 
-  const vault = el('div.flex.justify-center.gap-2.sm:gap-3', {
+  const vault = el('div flex justify-center gap-2 sm:gap-3', {
     'data-testid': 'digit-vault',
     role: 'group',
     'aria-label': t('game.enter', { n: digitCount }),
   });
 
-  const hint = el('p.text-center.text-sm.text-muted', { text: t('game.enter', { n: digitCount }) });
+  const hint = el('p text-center text-xs leading-relaxed text-faint', { text: t('game.tip') });
 
   /** @type {HTMLElement[]} */
   const tiles = [];
 
   for (let i = 0; i < digitCount; i += 1) {
     const tile = el(
-      'div.tnum.flex.h-16.w-14.items-center.justify-center.rounded-2xl.border-2.border-violet/40.bg-panel-soft.text-3xl.font-extrabold.text-text.transition-all.sm:h-20.sm:w-16',
+      'div tnum flex h-16 w-14 items-center justify-center rounded-2xl border-2 border-violet/40 bg-panel-soft text-3xl font-extrabold text-text transition-all sm:h-20 sm:w-16',
       { 'data-tile-index': i },
     );
     tiles.push(tile);
     vault.append(tile);
   }
 
-  const keypad = el('div.grid.grid-cols-3.gap-2', { 'data-testid': 'keypad' });
+  const keypad = el('div grid grid-cols-3 gap-2', { 'data-testid': 'keypad' });
 
   /** @type {HTMLButtonElement[]} */
   const keypadButtons = [];

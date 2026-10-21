@@ -23,16 +23,16 @@ import { t } from '../../i18n/index.js';
  * @param {(text: string) => void} options.onSend
  */
 export function createChat({ onSend }) {
-  const panel = el('section.flex.min-h-0.flex-col.gap-3', { 'data-testid': 'chat' });
+  const panel = el('section flex min-h-0 flex-col gap-3', { 'data-testid': 'chat' });
 
-  panel.append(el('h2.font-display.text-lg.font-extrabold', { text: t('lobby.chat') }));
+  panel.append(el('h2 font-display text-lg font-extrabold', { text: t('lobby.chat') }));
 
   const log = el(
-    'div.flex.min-h-24.flex-1.flex-col.gap-1.5.overflow-y-auto.rounded-xl.border.border-violet/20.bg-panel-soft/40.p-2.5',
+    'div flex min-h-24 flex-1 flex-col gap-1.5 overflow-y-auto rounded-xl border border-violet/20 bg-panel-soft/40 p-2.5',
     { 'data-testid': 'chat-log', role: 'log', 'aria-live': 'polite' },
   );
 
-  const form = el('form.flex.gap-2', { 'data-testid': 'chat-form' });
+  const form = el('form flex gap-2', { 'data-testid': 'chat-form' });
 
   const input = elInput({
     class: 'flex-1 min-w-0 rounded-xl border border-violet/25 bg-panel-soft px-3 py-2 text-sm',
@@ -75,13 +75,13 @@ export function createChat({ onSend }) {
      * @param {ChatEntry} entry
      */
     append(entry) {
-      const bubble = el('div.rounded-lg.border.border-violet/15.bg-panel/70.px-2.5.py-1.5', {
+      const bubble = el('div rounded-lg border border-violet/15 bg-panel/70 px-2.5 py-1.5', {
         'data-chat-from': entry.from,
       });
 
       bubble.append(
-        el('span.text-[10px].font-bold.text-cyan', { text: entry.name }),
-        el('p.break-words.text-sm.text-text', { text: entry.text }),
+        el('span text-[10px] font-bold text-cyan', { text: entry.name }),
+        el('p break-words text-sm text-text', { text: entry.text }),
       );
 
       log.append(bubble);

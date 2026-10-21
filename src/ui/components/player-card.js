@@ -25,7 +25,7 @@ export function createPlayerCard(player, { isSelf, isTurn, maxAttempts }) {
   const isActive = player.status === PlayerStatus.ACTIVE;
 
   const card = el(
-    'div.flex.items-center.gap-3.rounded-2xl.border.border-violet/25.bg-panel-soft/60.px-3.py-2.5.transition-colors',
+    'div flex items-center gap-3 rounded-2xl border border-violet/25 bg-panel-soft/60 px-3 py-2.5 transition-colors',
     {
       'data-testid': 'player-card',
       'data-player-id': player.id,
@@ -40,11 +40,11 @@ export function createPlayerCard(player, { isSelf, isTurn, maxAttempts }) {
     card.classList.add('opacity-55');
   }
 
-  const avatarWrap = el('div.relative', {}, [avatar(player.avatar, 40)]);
+  const avatarWrap = el('div relative', {}, [avatar(player.avatar, 40)]);
   if (isTurn && isActive) {
     avatarWrap.append(
       el(
-        'span.absolute.-end-1.-bottom-1.h-3.w-3.rounded-full.bg-mint.shadow-[0_0_10px_var(--color-mint)]',
+        'span absolute -end-1 -bottom-1 h-3 w-3 rounded-full bg-mint shadow-[0_0_10px_var(--color-mint)]',
         {
           'aria-hidden': 'true',
         },
@@ -53,17 +53,13 @@ export function createPlayerCard(player, { isSelf, isTurn, maxAttempts }) {
   }
   card.append(avatarWrap);
 
-  const nameRow = el('div.flex.items-center.gap-1.5', {}, [
-    el('span.truncate.text-sm.font-bold', {
-      text: player.name,
-      'data-testid': 'player-name',
-    }),
-  ]);
+  // The name gets the whole first line, so it is never truncated by a badge.
+  const badges = el('div flex items-center gap-1');
 
   if (player.isHost) {
-    nameRow.append(
+    badges.append(
       el(
-        'span.inline-flex.items-center.gap-0.5.rounded-full.bg-gold/15.px-1.5.py-0.5.text-[10px].font-bold.text-gold',
+        'span inline-flex items-center gap-0.5 rounded-full bg-gold/15 px-1.5 py-0.5 text-[10px] font-bold text-gold',
         {
           'data-testid': 'player-role',
         },
@@ -73,33 +69,36 @@ export function createPlayerCard(player, { isSelf, isTurn, maxAttempts }) {
   }
 
   if (isSelf) {
-    nameRow.append(
-      el('span.rounded-full.bg-cyan/15.px-1.5.py-0.5.text-[10px].font-bold.text-cyan', {
+    badges.append(
+      el('span rounded-full bg-cyan/15 px-1.5 py-0.5 text-[10px] font-bold text-cyan', {
         text: t('common.you'),
       }),
     );
   }
 
   const statusText = describeStatus(player, isTurn, maxAttempts);
-  const status = el('p.mt-0.5.text-xs', {
+  const status = el('p text-xs', {
     text: statusText.text,
     class: `text-xs ${statusText.tone}`,
   });
 
-  const meta = el('div.flex.items-center.gap-2', {}, [
-    el('span.tnum.text-xs.font-bold.text-gold', {
-      text: String(player.points),
-      'data-testid': 'player-points',
+  const points = el('span tnum text-xs font-bold text-gold', {
+    text: String(player.points),
+    'data-testid': 'player-points',
+  });
+
+  const topRow = el('div flex items-center gap-2', {}, [
+    el('span min-w-0 flex-1 truncate text-sm font-bold', {
+      text: player.name,
+      'data-testid': 'player-name',
     }),
-    el('span.text-xs.text-faint', {
-      text: t('game.points'),
-    }),
+    points,
+    el('span text-[10px] text-faint', { text: t('game.points') }),
   ]);
 
-  const left = el('div.min-w-0.flex-1', {}, [nameRow, status]);
-  const right = el('div.flex.flex-col.items-end.gap-1', {}, [meta]);
+  const bottomRow = el('div mt-0.5 flex items-center gap-1.5', {}, [status, badges]);
 
-  card.append(left, right);
+  card.append(el('div min-w-0 flex-1', {}, [topRow, bottomRow]));
   return card;
 }
 
